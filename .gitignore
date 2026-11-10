@@ -1,0 +1,30 @@
+# Dependências
+node_modules/
+
+# Build do frontend (Vite)
+dist/
+dist-ssr/
+*.local
+
+# Build do Rust / Tauri (inclui o instalador em target/release/bundle)
+src-tauri/target/
+# Schemas gerados automaticamente pelo Tauri a cada build
+src-tauri/gen/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Variáveis de ambiente / segredos
+.env
+.env.*
+
+# Editores e sistema
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.swp
+Thumbs.db
+desktop.ini
+.DS_Store
