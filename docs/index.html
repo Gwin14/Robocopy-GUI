@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RoboBackup - Download</title>
+  <meta name="description" content="Baixe a versão mais recente do RoboBackup, o programa de backup simples para Windows.">
+  <link rel="icon" type="image/svg+xml" href="app-icon.svg">
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1d2433;
+      --muted: #5b6577;
+      --border: #dde3ec;
+      --accent: #2f80ed;
+      --accent-hover: #1b4fa8;
+      --ok: #1e8e5a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #10141c;
+        --card: #181e29;
+        --text: #e7ebf2;
+        --muted: #9aa4b5;
+        --border: #2a3343;
+        --accent: #4a92f0;
+        --accent-hover: #2f80ed;
+        --ok: #43c08a;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+    }
+    main {
+      width: 100%;
+      max-width: 560px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .logo { width: 96px; height: 96px; }
+    h1 { margin: 16px 0 4px; font-size: 32px; }
+    .tagline { margin: 0 0 28px; color: var(--muted); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background .15s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn[aria-disabled="true"] { opacity: .6; pointer-events: none; }
+    .btn svg { width: 22px; height: 22px; }
+    .meta { margin: 14px 0 0; font-size: 14px; color: var(--muted); min-height: 1.5em; }
+    .meta.error { color: #d14343; }
+    .links { margin-top: 8px; font-size: 14px; }
+    .links a { color: var(--accent); }
+    hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0 24px; }
+    ol { text-align: left; margin: 0; padding-left: 22px; color: var(--muted); font-size: 15px; }
+    ol li { margin-bottom: 6px; }
+    ol strong { color: var(--text); }
+    h2 { font-size: 17px; margin: 0 0 12px; text-align: left; }
+    .req { margin-top: 20px; font-size: 13px; color: var(--muted); text-align: left; }
+  </style>
+</head>
+<body>
+  <main>
+    <img class="logo" src="app-icon.svg" alt="">
+    <h1>RoboBackup</h1>
+    <p class="tagline">Backup simples para Windows, sem precisar usar o terminal.</p>
+
+    <a id="download" class="btn" href="https://github.com/Gwin14/Robocopy-GUI/releases/latest" aria-disabled="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>
+      </svg>
+      <span id="label">Baixar para Windows</span>
+    </a>
+    <p id="meta" class="meta">Buscando a versão mais recente…</p>
+    <p class="links">
+      <a id="notes" href="https://github.com/Gwin14/Robocopy-GUI/releases/latest">Novidades desta versão</a>
+      ·
+      <a href="https://github.com/Gwin14/Robocopy-GUI/releases">Versões anteriores</a>
+    </p>
+
+    <hr>
+
+    <h2>Como instalar</h2>
+    <ol>
+      <li>Abra o arquivo baixado e aceite o pedido de administrador.</li>
+      <li>Abra o RoboBackup e clique em <strong>Preparar o computador</strong>.</li>
+      <li>Clique em <strong>Nova rotina de backup</strong> e siga o assistente.</li>
+      <li>Clique em <strong>Executar agora</strong> e confira se aparece em verde.</li>
+    </ol>
+    <p class="req">Requer Windows 10 ou 11 (64 bits).</p>
+  </main>
+
+  <script>
+    (function () {
+      var REPO = "Gwin14/Robocopy-GUI";
+      var btn = document.getElementById("download");
+      var label = document.getElementById("label");
+      var meta = document.getElementById("meta");
+      var notes = document.getElementById("notes");
+
+      function formatSize(bytes) {
+        return (bytes / 1024 / 1024).toFixed(1).replace(".", ",") + " MB";
+      }
+
+      function pickAsset(assets) {
+        var patterns = [/-setup\.exe$/i, /\.exe$/i, /\.msi$/i];
+        for (var i = 0; i < patterns.length; i++) {
+          for (var j = 0; j < assets.length; j++) {
+            if (patterns[i].test(assets[j].name)) return assets[j];
+          }
+        }
+        return null;
+      }
+
+      function fallback(msg) {
+        btn.removeAttribute("aria-disabled");
+        meta.textContent = msg;
+      }
+
+      fetch("https://api.github.com/repos/" + REPO + "/releases/latest", {
+        headers: { Accept: "application/vnd.github+json" }
+      })
+        .then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then(function (release) {
+          var asset = pickAsset(release.assets || []);
+          notes.href = release.html_url;
+          if (!asset) {
+            fallback("Instalador não encontrado. O botão abre a página da versão " + release.tag_name + ".");
+            return;
+          }
+          btn.href = asset.browser_download_url;
+          btn.removeAttribute("aria-disabled");
+          var version = (release.tag_name || "").replace(/^v/i, "");
+          label.textContent = "Baixar RoboBackup " + version;
+          var date = new Date(release.published_at).toLocaleDateString("pt-BR");
+          meta.textContent = asset.name + " · " + formatSize(asset.size) + " · publicado em " + date;
+        })
+        .catch(function () {
+          fallback("Não foi possível consultar a versão. O botão abre a página de downloads no GitHub.");
+        });
+    })();
+  </script>
+</body>
+</html>
